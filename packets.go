@@ -289,6 +289,7 @@ func (mc *mysqlConn) initCapabilities(serverCapabilities capabilityFlag, serverE
 			clientPluginAuth |
 			clientMultiResults |
 			clientConnectAttrs |
+			clientSupportOracleMode |
 			clientDeprecateEOF
 
 	if cfg.ClientFoundRows {

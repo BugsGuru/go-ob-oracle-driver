@@ -23,6 +23,8 @@ const (
 	// See https://dev.mysql.com/doc/refman/8.0/en/performance-schema-connection-attribute-tables.html#performance-schema-connection-attributes-available
 	connAttrClientName      = "_client_name"
 	connAttrClientNameValue = "Go-MySQL-Driver"
+	connAttrOBClientName    = "__ob_client_name"
+	connAttrOBClientVersion = "__ob_client_version"
 	connAttrOS              = "_os"
 	connAttrOSValue         = runtime.GOOS
 	connAttrPlatform        = "_platform"
@@ -73,6 +75,9 @@ const (
 	clientSessionTrack
 	clientDeprecateEOF
 )
+
+// OceanBase-specific capability flag for Oracle tenant mode.
+const clientSupportOracleMode capabilityFlag = 1 << 27
 
 // https://mariadb.com/kb/en/connection/#capabilities
 type extendedCapabilityFlag uint32

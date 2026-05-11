@@ -27,6 +27,10 @@ func encodeConnectionAttributes(cfg *Config) string {
 	connAttrsBuf := make([]byte, 0)
 
 	// default connection attributes
+	connAttrsBuf = appendLengthEncodedString(connAttrsBuf, connAttrOBClientName)
+	connAttrsBuf = appendLengthEncodedString(connAttrsBuf, "OceanBase Connector/C")
+	connAttrsBuf = appendLengthEncodedString(connAttrsBuf, connAttrOBClientVersion)
+	connAttrsBuf = appendLengthEncodedString(connAttrsBuf, "2.2.5")
 	connAttrsBuf = appendLengthEncodedString(connAttrsBuf, connAttrClientName)
 	connAttrsBuf = appendLengthEncodedString(connAttrsBuf, connAttrClientNameValue)
 	connAttrsBuf = appendLengthEncodedString(connAttrsBuf, connAttrOS)
