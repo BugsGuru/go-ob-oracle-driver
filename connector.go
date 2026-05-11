@@ -46,7 +46,7 @@ func encodeConnectionAttributes(cfg *Config) string {
 	}
 
 	// user-defined connection attributes
-	for connAttr := range strings.SplitSeq(cfg.ConnectionAttributes, ",") {
+	for _, connAttr := range strings.Split(cfg.ConnectionAttributes, ",") {
 		k, v, found := strings.Cut(connAttr, ":")
 		if !found {
 			continue
