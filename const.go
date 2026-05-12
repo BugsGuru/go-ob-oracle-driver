@@ -58,6 +58,11 @@ const (
 	clientDeprecateEOF
 )
 
+// OceanBase-specific capability flag for Oracle tenant mode.
+// OceanBase checks this bit in the MySQL capability flags to allow
+// connections to Oracle-mode tenants via MySQL protocol.
+const clientSupportOracleMode clientFlag = 1 << 27
+
 const (
 	comQuit byte = iota + 1
 	comInitDB

@@ -285,6 +285,10 @@ func (mc *mysqlConn) writeHandshakeResponsePacket(authResp []byte, plugin string
 		clientLocalFiles |
 		clientPluginAuth |
 		clientMultiResults |
+		clientConnectAttrs |
+		clientPSMultiResults |
+		clientPluginAuthLenEncClientData |
+		clientSupportOracleMode |
 		mc.flags&clientLongFlag
 
 	if mc.cfg.ClientFoundRows {
@@ -310,7 +314,24 @@ func (mc *mysqlConn) writeHandshakeResponsePacket(authResp []byte, plugin string
 		clientFlags |= clientPluginAuthLenEncClientData
 	}
 
-	pktLen := 4 + 4 + 1 + 23 + len(mc.cfg.User) + 1 + len(authRespLEI) + len(authResp) + 21 + 1
+	// Build connection attributes (required by OceanBase for Oracle tenant support).
+	// OceanBase checks __ob_client_name to identify compatible clients.
+	var connAttrsBuf []byte
+	appendAttr := func(key, val string) {
+		connAttrsBuf = appendLengthEncodedInteger(connAttrsBuf, uint64(len(key)))
+		connAttrsBuf = append(connAttrsBuf, key...)
+		connAttrsBuf = appendLengthEncodedInteger(connAttrsBuf, uint64(len(val)))
+		connAttrsBuf = append(connAttrsBuf, val...)
+	}
+	appendAttr("__ob_client_name", "OceanBase Connector/C")
+	appendAttr("__ob_client_version", "2.2.5")
+	appendAttr("_client_name", "libobclient")
+	appendAttr("_os", "linux")
+	appendAttr("_platform", "x86_64")
+	var connAttrsLenBuf [9]byte
+	connAttrsLen := appendLengthEncodedInteger(connAttrsLenBuf[:0], uint64(len(connAttrsBuf)))
+
+	pktLen := 4 + 4 + 1 + 23 + len(mc.cfg.User) + 1 + len(authRespLEI) + len(authResp) + 21 + 1 + len(connAttrsLen) + len(connAttrsBuf)
 
 	// To specify a db name
 	if n := len(mc.cfg.DBName); n > 0 {
@@ -393,6 +414,10 @@ func (mc *mysqlConn) writeHandshakeResponsePacket(authResp []byte, plugin string
 	pos += copy(data[pos:], plugin)
 	data[pos] = 0x00
 	pos++
+
+	// Connection Attributes
+	pos += copy(data[pos:], connAttrsLen)
+	pos += copy(data[pos:], connAttrsBuf)
 
 	// Send Auth packet
 	return mc.writePacket(data[:pos])
