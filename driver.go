@@ -81,7 +81,10 @@ func (d MySQLDriver) Open(dsn string) (driver.Conn, error) {
 }
 
 func init() {
-	sql.Register("mysql", &MySQLDriver{})
+	// Not "mysql": when built as a Go plugin alongside a host that already
+	// registered github.com/go-sql-driver/mysql, a second "mysql" panics.
+	// Use sql.Open("oceanbase_oracle_mysql", dsn) or NewConnector + sql.OpenDB.
+	sql.Register("oceanbase_oracle_mysql", &MySQLDriver{})
 }
 
 // NewConnector returns new driver.Connector.
